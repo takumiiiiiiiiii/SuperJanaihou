@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening.Core.Easing;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,6 +9,7 @@ using UnityEngine.UI;
 //このクラスの is_revtime 変数は 頻繁に他のクラスから参照されます　ki43IIIより
 public class TIME_MANAGER : MonoBehaviour
 {
+    [SerializeField] private UIImageColorWarp uiwarp;
     public bool Enable_show_all_palam = false;
     public FallSenser fallSenser;
     public static bool is_revtime = false;
@@ -31,8 +33,18 @@ public class TIME_MANAGER : MonoBehaviour
     bool is_respone_flag = false;
 
     // Start is called before the first frame update
+    private void Awake()
+    {
+        is_revtime = false;
+        uiwarp = FindFirstObjectByType<UIImageColorWarp>();
+        if (uiwarp == null)
+        {
+            Debug.LogError("UIImageColorWrapが見つかりません", this);
+        }
+    }
     void Start()
     {
+
         debug_slider.maxValue = 8;
         debug_slider.value = 8;
         current_clock_value = max_clock;
@@ -42,7 +54,7 @@ public class TIME_MANAGER : MonoBehaviour
     void Update()
     {
         //public_slider_value = debug_slider.value;
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetButtonDown("Fire2"))
         {
             if (is_revtime==false && debug_slider.value > 0.1 )
             {
@@ -57,6 +69,7 @@ public class TIME_MANAGER : MonoBehaviour
         
         if (is_revtime == true)
         {
+            uiwarp.ChangeToEndColor();
             if (decreasing_gage == true)
             {
                 current_clock_value -= Time.deltaTime;
@@ -67,6 +80,10 @@ public class TIME_MANAGER : MonoBehaviour
                 is_revtime = false;
             }
 
+        }
+        else
+        {
+            uiwarp.ChangeToStartColor();
         }
 
         //そのうち短縮版のコードを書きます
@@ -103,24 +120,14 @@ public class TIME_MANAGER : MonoBehaviour
             debug_slider.value = 1;
 
         }
-        else if (is_respone_flag == false)//ゲージが０になるとき呼ばれる
+        else //ゲージが０になるとき呼ばれる
         {
-            
-            is_respone_flag = true;
-            StartCoroutine(DelayCoroutine(after_nogage_respone, () =>
-            {
-                is_respone_flag = false;
-                // n秒後にここの処理が実行される
-                if (current_clock_value < max_clock / 8)
-                {
-                    fallSenser.nogage_respone();
-                    fallSenser.revival_clock();
-                }
-            }));
-        }else if(is_respone_flag == true)
-        {
-            debug_slider.value = 0.01f;
+            debug_slider.value = 0;
         }
+        //else if(is_respone_flag == true)
+        //{
+        //    debug_slider.value = 0.01f;
+        //}
 
 
     }

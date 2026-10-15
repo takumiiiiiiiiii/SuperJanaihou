@@ -6,8 +6,11 @@ public class Audio_Manager : MonoBehaviour
 {
     [SerializeField] AudioSource source1;
     [SerializeField] AudioSource source2;
+    [SerializeField] AudioSource source3;
     [SerializeField] AudioClip clip1;
     [SerializeField] AudioClip clip2;
+    [SerializeField] AudioClip goal;
+    public bool isGoal = false;
     void Start()
     {
         source1.PlayOneShot(clip1);
@@ -16,21 +19,36 @@ public class Audio_Manager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (TIME_MANAGER.is_revtime == true)
+        if (isGoal)
         {
-            if (source2.isPlaying == false)
+            if(source3.isPlaying == false)
             {
                 source1.mute = true;
-                source2.PlayOneShot(clip2);
+                source2.mute = true;
+                source3.PlayOneShot(goal);
             }
+
         }
         else
         {
-            if (source2.isPlaying == true)
+            if (TIME_MANAGER.is_revtime == true)
             {
-                source2.Stop();
-                source1.mute = false;
+                if (source2.isPlaying == false)
+                {
+                    source1.mute = true;
+                    source2.PlayOneShot(clip2);
+                }
+            }
+            else
+            {
+                if (source2.isPlaying == true)
+                {
+                    source2.Stop();
+                    source1.mute = false;
+                }
             }
         }
+      
     }
+
 }
